@@ -1,7 +1,8 @@
-
 /**
  * API service for sending requests to the OpenAI-compatible endpoint
  */
+
+import { apiConfig } from '@/config/apiConfig';
 
 export type ActionType = 'explain' | 'correct' | 'translate' | 'summarize' | 'rewrite' | 'shorten';
 
@@ -14,13 +15,14 @@ export interface StreamRequest {
  * Sends a request to the OpenAI-compatible endpoint and returns a ReadableStream
  */
 export async function streamResponse({ input, action }: StreamRequest): Promise<ReadableStream<Uint8Array>> {
-  const response = await fetch('http://localhost:8765/chat/completions', {
+  const response = await fetch(apiConfig.endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...(apiConfig.apiKey ? { 'Authorization': `Bearer ${apiConfig.apiKey}` } : {}),
     },
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo', // This can be any model, as your endpoint likely ignores it
+      model: apiConfig.model,
       messages: [
         {
           role: 'user',
